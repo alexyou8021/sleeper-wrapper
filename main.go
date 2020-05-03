@@ -25,7 +25,10 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "success")
 	})
-	router.POST("/", handlers.Handler())
+	//router.POST("/", handlers.Handler())
+	router.GET("/user/:name", func(ctx *gin.Context) {
+		handlers.Handler(ctx)
+	})
 
 	router.Run(":" + port)
 }

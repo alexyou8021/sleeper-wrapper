@@ -1,12 +1,11 @@
 package controllers
 
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
+	"github.com/alexyou8021/sleeper-wrapper.git/clients/sleeper"
+	"github.com/alexyou8021/sleeper-wrapper.git/entities"
 )
 
-func Controller() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.String(http.StatusOK, "success")
-	}
+func Controller(username string) entities.User {
+	result := sleeper.GetUserByUsername(username)
+	return result
 }
