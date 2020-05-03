@@ -1,1 +1,1 @@
-web: bin/sleeper-wrapper
+web: bin/sleeper-wrapper.git

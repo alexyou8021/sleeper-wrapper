@@ -1,12 +1,10 @@
 {
   "name": "Start on Heroku: Go",
-  "description": "Go Getting Started Example App",
+  "description": "Sleeper wrapper",
   "keywords": [
-    "getting-started",
-    "go",
-    "sample",
-    "example"
-  ],
+    "sleeper",
+    "go"
+  ,
   "website": "http://github.com/alexyou8021/sleeper-wrapper.git",
   "repository": "http://github.com/alexyou8021/sleeper-wrapper.git"
 }
