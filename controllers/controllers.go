@@ -11,6 +11,7 @@ func Controller(username string) []entities.TransactionResponse {
 	leagues := sleeper.GetAllLeagues(user)
 	transactions := getTransactionsForUser(user, leagues[0])
 	response := mappers.ToTransactionResponse(transactions)
+
 	return response
 }
 
@@ -29,6 +30,7 @@ func getRosterIdFromLeagueForUser(user entities.User, league entities.League) in
 			return roster.RosterId
 		}
 	}
+
 	return -1
 }
 
@@ -47,5 +49,6 @@ func getTransactionsFromRosterId(transactions []entities.Transaction, rosterId i
 			}
 		}
 	}
+
 	return result
 }

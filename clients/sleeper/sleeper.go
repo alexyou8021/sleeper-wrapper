@@ -3,7 +3,6 @@ package sleeper
 import (
 	"net/http"
 	"io/ioutil"
-	"log"
 	"encoding/json"
 	"strconv"
 
@@ -11,14 +10,12 @@ import (
 )
 
 func GetUserByUsername(username string) entities.User {
-        username = "376687828232613888"
 	url := "https://api.sleeper.app/v1/user/" + username
 	resp, _ := http.Get(url)
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	var user entities.User
 	json.Unmarshal(bodyBytes, &user)
-	log.Println(user)
 
 	return user
 }

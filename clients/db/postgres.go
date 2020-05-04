@@ -10,17 +10,13 @@ import (
 
 	"database/sql"
 	_ "github.com/lib/pq"
+
+	"github.com/alexyou8021/sleeper-wrapper.git/entities"
 )
 
 var (
 	db  *sql.DB
 )
-
-type Player struct {
-	Id       int    `json: id`
-	Name     string `json: name`
-	Position string `json: position`
-}
 
 func RemakePlayersTable() {
 	CreatePlayersTable()
@@ -46,16 +42,20 @@ func StorePlayers() {
 	resp, _ := http.Get(url)
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	var players map[int]map[string]interface{}
+	var players map[string]map[string]interface{}
 	json.Unmarshal(bodyBytes, &players)
 
 	for _, value := range players {
 		id, _ := value["player_id"].(string)
 		name, _ := value["full_name"].(string)
 		name = strings.Replace(name, "'", "''", 1)
+		if name == "" {
+			name = value["first_name"].(string) + " " + value["last_name"].(string)
+		}
 		position, _ := value["position"].(string)
-		log.Println(name + " " + position + " " + id)
-		_, err := db.Exec("INSERT INTO players VALUES (" + id + ", '" + name + "', '" + position + "');")
+		execCmd := "INSERT INTO players VALUES ('" + id + "', '" + name + "', '" + position + "');"
+		log.Println(execCmd)
+		_, err := db.Exec(execCmd)
 		if err != nil {
 			log.Fatal(err)
 			break
@@ -63,13 +63,14 @@ func StorePlayers() {
 	}
 }
 
-func QueryPlayer(id string) (_ Player, _ error) {
-	var player Player
+func QueryPlayer(id string) (entities.Player, error) {
+	var player entities.Player
 
 	if db == nil {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
+	log.Println("SELECT * FROM players WHERE id='" + id+ "';")
 	result, err := db.Query("SELECT * FROM players WHERE id='" + id+ "';")
 	if err != nil {
 		log.Fatal(err)
