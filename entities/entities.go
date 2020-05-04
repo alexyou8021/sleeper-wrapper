@@ -23,6 +23,19 @@ type Transaction struct {
 	Status		string		`json:"status"`
 	Week		int		`json:"leg"`
 	RosterIds	[]int		`json:"roster_ids"`
-	Drops		map[string]int	`json:"drops"`
 	Adds		map[string]int	`json:"adds"`
+	Drops		map[string]int	`json:"drops"`
+}
+
+type TransactionResponse struct {
+	Type		string		`json:"type"`
+	Week		int		`json:"week"`
+	Adds		[]string	`json:"adds"`
+	Drops		[]string	`json:"drops"`
+}
+
+type Player struct {
+        Id       string `json: id`
+        Name     string `json: name`
+        Position string `json: position`
 }

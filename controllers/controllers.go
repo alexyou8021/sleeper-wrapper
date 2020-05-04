@@ -3,13 +3,15 @@ package controllers
 import (
 	"github.com/alexyou8021/sleeper-wrapper.git/clients/sleeper"
 	"github.com/alexyou8021/sleeper-wrapper.git/entities"
+	"github.com/alexyou8021/sleeper-wrapper.git/mappers"
 )
 
-func Controller(username string) []entities.Transaction {
+func Controller(username string) []entities.TransactionResponse {
 	user := sleeper.GetUserByUsername(username)
 	leagues := sleeper.GetAllLeagues(user)
 	transactions := getTransactionsForUser(user, leagues[0])
-	return transactions
+	response := mappers.ToTransactionResponse(transactions)
+	return response
 }
 
 func getTransactionsForUser(user entities.User, league entities.League) []entities.Transaction {
