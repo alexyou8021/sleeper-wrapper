@@ -1,6 +1,7 @@
 package mappers
 
 import (
+	"math"
 	"log"
 	"strconv"
 
@@ -9,7 +10,7 @@ import (
 )
 
 func ToTransactionResponse(transactions []entities.Transaction) []entities.TransactionResponse {
-	score := 1.4
+	score := 0.0
 	response := []entities.TransactionResponse{}
 	for _, transaction := range transactions {
 		adds := []string{}
@@ -33,7 +34,7 @@ func ToTransactionResponse(transactions []entities.Transaction) []entities.Trans
 			Week: transaction.Week,
 			Adds: adds,
 			Drops: drops,
-			Score: score,
+			Score: math.Round(score*100)/100,
 		})
 	}
 	return response

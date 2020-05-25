@@ -132,18 +132,18 @@ func QueryStats(name string, week string) (entities.Stats, error) {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
-	result, err := db.Query("SELECT name, week, position, team, sum(halfppr), sum(ppr), sum(standard) FROM stats WHERE name='" + name + "' AND week > " + week + " GROUP BY name, week, position, team;")
-	//result, err := db.Query("SELECT name, week, position, team, halfppr, ppr, standard FROM stats WHERE name='" + name + "' AND week > " + week + ";")
+	result, err := db.Query("SELECT name, position, team, sum(halfppr), sum(ppr), sum(standard) FROM stats WHERE name='" + name + "' AND week > " + week + " GROUP BY name, position, team;")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for result.Next() {
-		err = result.Scan(&stats.Name, &stats.Week, &stats.Position, &stats.Team, &stats.HalfPPR, &stats.PPR, &stats.Standard)
+		err = result.Scan(&stats.Name, &stats.Position, &stats.Team, &stats.HalfPPR, &stats.PPR, &stats.Standard)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
+	stats.Week = week
 
 	log.Println(stats)
 	return stats, nil
