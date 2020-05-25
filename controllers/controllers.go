@@ -42,6 +42,16 @@ func getTransactionsFromRosterId(transactions []entities.Transaction, rosterId i
 		if transaction.Type == "commissioner" {
 			continue
 		}
+		for key, tRosterId := range transaction.Adds {
+			if tRosterId != rosterId {
+				delete(transaction.Adds, key)
+			}
+		}
+		for key, tRosterId := range transaction.Drops {
+			if tRosterId != rosterId {
+				delete(transaction.Drops, key)
+			}
+		}
 		for _, tRosterId := range transaction.RosterIds {
 			if tRosterId == rosterId {
 				result = append(result, transaction)
