@@ -125,14 +125,23 @@ func QueryPlayer(id string) (entities.Player, error) {
 	return player, nil
 }
 
-func QueryStats(name string, week string) (entities.Stats, error) {
+func QueryStats(name string, week string, position string) (entities.Stats, error) {
 	var stats entities.Stats
 
 	if db == nil {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
-	result, err := db.Query("SELECT name, position, team, sum(halfppr), sum(ppr), sum(standard) FROM stats WHERE name='" + name + "' AND week > " + week + " GROUP BY name, position, team;")
+	queryName := strings.Replace(name, " Jr.", "", 1)
+	queryName = strings.Replace(queryName, " Sr.", "", 1)
+	queryName = strings.Replace(queryName, " IV", "", 1)
+	queryName = strings.Replace(queryName, " V", "", 1)
+	queryName = strings.Replace(queryName, " III", "", 1)
+	queryName = strings.Replace(queryName, " II", "", 1)
+	queryName = strings.Replace(queryName, "'", "''", 1)
+	log.Println(queryName + " " + week)
+
+	result, err := db.Query("SELECT name, position, team, sum(halfppr), sum(ppr), sum(standard) FROM stats WHERE name='" + queryName + "' AND week > " + week + " GROUP BY name, position, team;")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -144,8 +153,15 @@ func QueryStats(name string, week string) (entities.Stats, error) {
 		}
 	}
 	stats.Week = week
+	stats.Name = name
+	if position == "DEF" || position == "K" {
+		weekNum, _ := strconv.ParseFloat(week, 64)
+		remainingWeeks := 16.0 - weekNum
+		stats.HalfPPR = 8.0 * remainingWeeks
+		stats.PPR = 8.0 * remainingWeeks
+		stats.Standard = 8.0 * remainingWeeks
+	}
 
-	log.Println(name + " " + week)
 	log.Println(stats)
 	return stats, nil
 }

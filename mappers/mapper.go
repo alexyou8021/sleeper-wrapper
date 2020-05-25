@@ -17,13 +17,13 @@ func ToTransactionResponse(transactions []entities.Transaction) []entities.Trans
 		for key, _ := range transaction.Adds {
 			player, _ := db.QueryPlayer(key)
 			adds = append(adds, player.Name)
-			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week))
+			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week), player.Position)
 			score = score + playerScore.HalfPPR
 		}
 		for key, _ := range transaction.Drops {
 			player, _ := db.QueryPlayer(key)
 			drops = append(drops, player.Name)
-			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week))
+			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week), player.Position)
 			score = score - playerScore.HalfPPR
 		}
 		response = append(response, entities.TransactionResponse{
