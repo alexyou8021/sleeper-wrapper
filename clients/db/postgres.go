@@ -145,6 +145,7 @@ func QueryStats(name string, week string) (entities.Stats, error) {
 	}
 	stats.Week = week
 
+	log.Println(name + " " + week)
 	log.Println(stats)
 	return stats, nil
 }

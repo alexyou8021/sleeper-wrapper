@@ -2,7 +2,6 @@ package mappers
 
 import (
 	"math"
-	"log"
 	"strconv"
 
 	"github.com/alexyou8021/sleeper-wrapper.git/entities"
@@ -10,20 +9,18 @@ import (
 )
 
 func ToTransactionResponse(transactions []entities.Transaction) []entities.TransactionResponse {
-	score := 0.0
 	response := []entities.TransactionResponse{}
 	for _, transaction := range transactions {
+		score := 0.0
 		adds := []string{}
 		drops := []string{}
 		for key, _ := range transaction.Adds {
-			log.Println(key)
 			player, _ := db.QueryPlayer(key)
 			adds = append(adds, player.Name)
 			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week))
 			score = score + playerScore.HalfPPR
 		}
 		for key, _ := range transaction.Drops {
-			log.Println(key)
 			player, _ := db.QueryPlayer(key)
 			drops = append(drops, player.Name)
 			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week))
