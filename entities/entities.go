@@ -29,11 +29,11 @@ type Transaction struct {
 }
 
 type TransactionResponse struct {
-	Type		string		`json:"type"`
-	Week		int		`json:"week"`
-	Adds		[]string	`json:"adds"`
-	Drops		[]string	`json:"drops"`
-	Score		float64		`json:"score"`
+	Type		string			`json:"type"`
+	Week		int			`json:"week"`
+	Adds		map[string]string	`json:"adds"`
+	Drops		map[string]string	`json:"drops"`
+	Score		float64			`json:"score"`
 }
 
 type Player struct {
