@@ -80,20 +80,23 @@ func StoreStats() {
 	}
 
 
-	result := datapros.GetStatsFrom("2019", "1")
-	for _, stats := range result {
-		name := strings.Replace(stats.Name, "'", "''", 1)
-		week := "1"
-		position := stats.Position
-		team := stats.Team
-		halfppr := strconv.FormatFloat(stats.FantasyPoints["half_ppr"], 'f', 2, 64)
-		ppr := strconv.FormatFloat(stats.FantasyPoints["ppr"], 'f', 2, 64)
-		standard := strconv.FormatFloat(stats.FantasyPoints["standard"], 'f', 2, 64)
-		execCmd := "INSERT INTO stats VALUES ('" + name + "', " + week + ", '" + position + "', '" + team + "', " + halfppr + ", " + ppr + ", " + standard + ");"
-		log.Println(execCmd)
-		_, err := db.Exec(execCmd)
-		if err != nil {
-			log.Fatal(err)
+	for i := 1; i <= 16; i++ {
+		weekString := strconv.Itoa(i)
+		result := datapros.GetStatsFrom("2019", weekString)
+		for _, stats := range result {
+			name := strings.Replace(stats.Name, "'", "''", 1)
+			week := weekString
+			position := stats.Position
+			team := stats.Team
+			halfppr := strconv.FormatFloat(stats.FantasyPoints["half_ppr"], 'f', 2, 64)
+			ppr := strconv.FormatFloat(stats.FantasyPoints["ppr"], 'f', 2, 64)
+			standard := strconv.FormatFloat(stats.FantasyPoints["standard"], 'f', 2, 64)
+			execCmd := "INSERT INTO stats VALUES ('" + name + "', " + week + ", '" + position + "', '" + team + "', " + halfppr + ", " + ppr + ", " + standard + ");"
+			log.Println(execCmd)
+			_, err := db.Exec(execCmd)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }
@@ -105,7 +108,6 @@ func QueryPlayer(id string) (entities.Player, error) {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
-	log.Println("SELECT * FROM players WHERE id='" + id+ "';")
 	result, err := db.Query("SELECT * FROM players WHERE id='" + id+ "';")
 	if err != nil {
 		log.Fatal(err)
@@ -123,14 +125,15 @@ func QueryPlayer(id string) (entities.Player, error) {
 	return player, nil
 }
 
-func QueryStats(name string) (entities.Stats, error) {
+func QueryStats(name string, week string) (entities.Stats, error) {
 	var stats entities.Stats
 
 	if db == nil {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
-	result, err := db.Query("SELECT * FROM stats WHERE name='" + name + "';")
+	result, err := db.Query("SELECT name, week, position, team, sum(halfppr), sum(ppr), sum(standard) FROM stats WHERE name='" + name + "' AND week > " + week + " GROUP BY name, week, position, team;")
+	//result, err := db.Query("SELECT name, week, position, team, halfppr, ppr, standard FROM stats WHERE name='" + name + "' AND week > " + week + ";")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -142,5 +145,6 @@ func QueryStats(name string) (entities.Stats, error) {
 		}
 	}
 
+	log.Println(stats)
 	return stats, nil
 }
