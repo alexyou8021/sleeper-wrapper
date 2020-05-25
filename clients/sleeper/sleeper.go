@@ -60,6 +60,17 @@ func GetAllTransactions(league entities.League) []entities.Transaction {
 
 	return totalTransactions
 }
+
+func GetPlayers() map[string]map[string]interface{} {
+	url := "https://api.sleeper.app/v1/players/nfl/"
+	resp, _ := http.Get(url)
+	defer resp.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	var players map[string]map[string]interface{}
+	json.Unmarshal(bodyBytes, &players)
+
+	return players
+}
 /*func GetStats(season string, week string) map[int]map[string]float32 {
 	url := "https://api.sleeper.app/v1/stats/nfl/regular/" + season + "/" + week
 	resp, _ := http.Get(url)

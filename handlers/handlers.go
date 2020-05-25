@@ -14,7 +14,12 @@ func Handler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-func CreateTable(ctx *gin.Context) {
+func CreatePlayersTable(ctx *gin.Context) {
 	db.RemakePlayersTable()
+	ctx.JSON(http.StatusOK, "success")
+}
+
+func CreateStatsTable(ctx *gin.Context) {
+	db.RemakeStatsTable()
 	ctx.JSON(http.StatusOK, "success")
 }

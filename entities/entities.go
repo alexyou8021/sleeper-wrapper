@@ -35,7 +35,18 @@ type TransactionResponse struct {
 }
 
 type Player struct {
-        Id       string `json: id`
-        Name     string `json: name`
-        Position string `json: position`
+        Id       string `json:"id"`
+        Name     string `json:"name"`
+        Position string `json:"position"`
+}
+
+type Stats struct {
+	Name		string `json:"player_name"`
+	Week		string
+	Position	string `json:"position"`
+	Team		string `json:"team"`
+	FantasyPoints	map[string]float64 `json:"fantasy_points"`
+	HalfPPR		float64
+	PPR		float64
+	Standard	float64
 }

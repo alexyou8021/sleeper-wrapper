@@ -25,8 +25,11 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "success")
 	})
-	router.GET("/refreshtable", func(ctx *gin.Context) {
-		handlers.CreateTable(ctx)
+	router.GET("/refreshPlayersTable", func(ctx *gin.Context) {
+		handlers.CreatePlayersTable(ctx)
+	})
+	router.GET("/refreshStatsTable", func(ctx *gin.Context) {
+		handlers.CreateStatsTable(ctx)
 	})
 	router.GET("/user/:name", func(ctx *gin.Context) {
 		handlers.Handler(ctx)
