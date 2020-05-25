@@ -28,6 +28,7 @@ func ToTransactionResponse(transactions []entities.Transaction) []entities.Trans
 			Week: transaction.Week,
 			Adds: adds,
 			Drops: drops,
+			Score: transaction.Score,
 		})
 	}
 	return response

@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"github.com/alexyou8021/sleeper-wrapper.git/clients/sleeper"
+	"github.com/alexyou8021/sleeper-wrapper.git/clients/db"
 	"github.com/alexyou8021/sleeper-wrapper.git/entities"
 	"github.com/alexyou8021/sleeper-wrapper.git/mappers"
+	"log"
 )
 
 func Controller(username string) []entities.TransactionResponse {
@@ -54,6 +56,7 @@ func getTransactionsFromRosterId(transactions []entities.Transaction, rosterId i
 		}
 		for _, tRosterId := range transaction.RosterIds {
 			if tRosterId == rosterId {
+				transaction.Score = calculateTransactionScore(transaction)
 				result = append(result, transaction)
 				continue
 			}
@@ -61,4 +64,10 @@ func getTransactionsFromRosterId(transactions []entities.Transaction, rosterId i
 	}
 
 	return result
+}
+
+func calculateTransactionScore(transaction entities.Transaction) float64 {
+	stats, _ := db.QueryStats("Lamar Jackson")
+	log.Println(stats)
+	return 1.24
 }

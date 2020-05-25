@@ -18,4 +18,3 @@ func GetStatsFrom(year string, week string) []entities.Stats {
 
 	return stats
 }
-
