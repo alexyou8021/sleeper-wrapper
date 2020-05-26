@@ -85,6 +85,7 @@ func StoreStats() {
 		result := datapros.GetStatsFrom("2019", weekString)
 		for _, stats := range result {
 			name := strings.Replace(stats.Name, "'", "''", 1)
+			name = strings.ReplaceAll(name, ".", "")
 			week := weekString
 			position := stats.Position
 			team := stats.Team
@@ -132,13 +133,10 @@ func QueryStats(name string, week string, position string) (entities.Stats, erro
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
-	queryName := strings.Replace(name, " Jr.", "", 1)
-	queryName = strings.Replace(queryName, " Sr.", "", 1)
-	queryName = strings.Replace(queryName, " IV", "", 1)
-	queryName = strings.Replace(queryName, " V", "", 1)
-	queryName = strings.Replace(queryName, " III", "", 1)
-	queryName = strings.Replace(queryName, " II", "", 1)
+	splitName := strings.Split(name, " ")
+	queryName := splitName[0] + " " + splitName[1]
 	queryName = strings.Replace(queryName, "'", "''", 1)
+	queryName = strings.ReplaceAll(queryName, ".", "")
 	log.Println(queryName + " " + week)
 
 	result, err := db.Query("SELECT name, position, team, sum(halfppr), sum(ppr), sum(standard) FROM stats WHERE name='" + queryName + "' AND week > " + week + " GROUP BY name, position, team;")
