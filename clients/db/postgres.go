@@ -92,6 +92,9 @@ func StoreStats() {
 			halfppr := strconv.FormatFloat(stats.FantasyPoints["half_ppr"], 'f', 2, 64)
 			ppr := strconv.FormatFloat(stats.FantasyPoints["ppr"], 'f', 2, 64)
 			standard := strconv.FormatFloat(stats.FantasyPoints["standard"], 'f', 2, 64)
+			if halfppr == "0.00" && ppr == "0.00" && standard == "0.00" {
+				continue
+			}
 			execCmd := "INSERT INTO stats VALUES ('" + name + "', " + week + ", '" + position + "', '" + team + "', " + halfppr + ", " + ppr + ", " + standard + ");"
 			log.Println(execCmd)
 			_, err := db.Exec(execCmd)
