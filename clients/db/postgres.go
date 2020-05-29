@@ -106,6 +106,7 @@ func StoreStats() {
 }
 
 func QueryPlayer(id string) (entities.Player, error) {
+	log.Println("QueryPlayer: " + id)
 	var player entities.Player
 
 	if db == nil {
@@ -130,6 +131,7 @@ func QueryPlayer(id string) (entities.Player, error) {
 }
 
 func QueryStats(name string, week string, position string) (entities.Stats, error) {
+	log.Println("QueryStats: " + name + " " + week + " " + position)
 	var stats entities.Stats
 
 	if db == nil {

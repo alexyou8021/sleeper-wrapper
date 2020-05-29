@@ -13,9 +13,10 @@ type League struct {
 }
 
 type Roster struct {
-	RosterId	int	`json:"roster_id"`
-	LeagueId	string	`json:"league_id"`
-	OwnerId		string	`json:"owner_id"`
+	RosterId	int	 `json:"roster_id"`
+	LeagueId	string	 `json:"league_id"`
+	OwnerId		string	 `json:"owner_id"`
+	CoOwnersIds     []string `json:"co_owners"`
 }
 
 type Transaction struct {

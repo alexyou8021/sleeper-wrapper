@@ -29,6 +29,11 @@ func getRosterIdFromLeagueForUser(user entities.User, league entities.League) in
 		if roster.OwnerId == user.UserId {
 			return roster.RosterId
 		}
+		for _, coownerId := range roster.CoOwnersIds {
+			if coownerId == user.UserId {
+				return roster.RosterId
+			}
+		}
 	}
 
 	return -1
