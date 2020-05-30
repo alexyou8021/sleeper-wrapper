@@ -12,19 +12,25 @@ func ToTransactionResponse(transactions []entities.Transaction) []entities.Trans
 	response := []entities.TransactionResponse{}
 	for _, transaction := range transactions {
 		score := 0.0
-		adds := map[string]string{}
-		drops := map[string]string{}
+		adds := []entities.Player{}
+		drops := []entities.Player{}
 		for key, _ := range transaction.Adds {
 			if key == "OAK" {
 				name := "Oakland Raiders"
 				position := "DEF"
-				adds[name] = key
+				adds = append(adds, entities.Player{
+					Id:   "OAK",
+					Name: name,
+					Position: position,
+					ImageURL: "https://sleepercdn.com/images/team_logos/nfl/oak.png",
+					Hyperlink: "https://www.nfl.com/teams/las-vegas-raiders/stats",
+				})
 				playerScore, _ := db.QueryStats(name, strconv.Itoa(transaction.Week), position)
 				score = score + playerScore.HalfPPR
 				continue
 			}
 			player, _ := db.QueryPlayer(key)
-			adds[player.Name] = player.Id
+			adds = append(adds, player)
 			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week), player.Position)
 			score = score + playerScore.HalfPPR
 		}
@@ -32,13 +38,19 @@ func ToTransactionResponse(transactions []entities.Transaction) []entities.Trans
 			if key == "OAK" {
 				name := "Oakland Raiders"
 				position := "DEF"
-				adds[name] = key
+				drops = append(drops, entities.Player{
+					Id:   "OAK",
+					Name: name,
+					Position: position,
+					ImageURL: "https://sleepercdn.com/images/team_logos/nfl/oak.png",
+					Hyperlink: "https://www.nfl.com/teams/las-vegas-raiders/stats",
+				})
 				playerScore, _ := db.QueryStats(name, strconv.Itoa(transaction.Week), position)
-				score = score + playerScore.HalfPPR
+				score = score - playerScore.HalfPPR
 				continue
 			}
 			player, _ := db.QueryPlayer(key)
-			drops[player.Name] = player.Id
+			drops = append(drops, player)
 			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week), player.Position)
 			score = score - playerScore.HalfPPR
 		}

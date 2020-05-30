@@ -32,15 +32,17 @@ type Transaction struct {
 type TransactionResponse struct {
 	Type		string			`json:"type"`
 	Week		int			`json:"week"`
-	Adds		map[string]string	`json:"adds"`
-	Drops		map[string]string	`json:"drops"`
+	Adds		[]Player		`json:"adds"`
+	Drops		[]Player		`json:"drops"`
 	Score		float64			`json:"score"`
 }
 
 type Player struct {
-        Id       string `json:"id"`
-        Name     string `json:"name"`
-        Position string `json:"position"`
+        Id		string `json:"id"`
+        Name     	string `json:"name"`
+        Position 	string `json:"position"`
+        ImageURL  	string `json:"image_url"`
+        Hyperlink 	string `json:"hyperlink"`
 }
 
 type Stats struct {

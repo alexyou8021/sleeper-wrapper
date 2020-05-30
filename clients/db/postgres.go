@@ -126,6 +126,23 @@ func QueryPlayer(id string) (entities.Player, error) {
 			return player, err
 		}
 	}
+	if player.Position == "DEF" {
+		formattedName := strings.ReplaceAll(player.Name, " ", "-")
+		player.ImageURL = "https://sleepercdn.com/images/team_logos/nfl/" + strings.ToLower(player.Id) + ".png"
+		player.Hyperlink = "https://www.nfl.com/teams/" + formattedName + "/stats"
+	} else {
+		replacedName := strings.ReplaceAll(player.Name, ".", "-")
+		replacedName = strings.ReplaceAll(replacedName, "'", "-")
+		splitName := strings.Split(replacedName, " ")
+		firstName := splitName[0]
+		if len(firstName) == 2 && firstName != "Bo" && firstName != "Ty" {
+			firstName = firstName[:1] + "-" + firstName[1:]
+		}
+		lastName := splitName[1]
+		formattedName := strings.Replace(firstName + "-" + lastName, "--", "-", 1)
+		player.ImageURL = "https://sleepercdn.com/content/nfl/players/" + player.Id + ".jpg";
+		player.Hyperlink = "https://www.nfl.com/players/" + formattedName + "/stats/logs"
+	}
 
 	return player, nil
 }
