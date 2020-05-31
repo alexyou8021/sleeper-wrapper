@@ -1,9 +1,14 @@
 package controllers
 
 import (
+	"github.com/alexyou8021/sleeper-wrapper.git/clients/espn"
 	"github.com/alexyou8021/sleeper-wrapper.git/clients/sleeper"
 	"github.com/alexyou8021/sleeper-wrapper.git/entities"
 	"github.com/alexyou8021/sleeper-wrapper.git/mappers"
+	"github.com/alexyou8021/sleeper-wrapper.git/clients/db"
+
+	"log"
+	"strconv"
 )
 
 func Controller(username string) []entities.TransactionResponse {
@@ -12,6 +17,53 @@ func Controller(username string) []entities.TransactionResponse {
 	transactions := getTransactionsForUser(user, leagues[0])
 	response := mappers.ToTransactionResponse(transactions)
 
+	return response
+}
+
+func GetESPNTransactions(id string) []entities.TransactionResponse {
+	var response []entities.TransactionResponse
+
+	transactions := espn.GetLeagueTransactions(id)
+	for _, transaction := range transactions {
+		rosterId := transaction.RosterId
+		atype := transaction.Type
+		messages := transaction.Messages
+		totalScore := 0.0
+		var ttype string
+		var adds []entities.Player
+		var drops []entities.Player
+
+		if atype != "ACTIVITY_TRANSACTIONS" {
+			continue
+		}
+		if rosterId != 0 {
+			continue
+		}
+		for _, message := range messages {
+			targetId := message.TargetId
+			typeId := message.TypeId
+			typeString := entities.ActivityMap[typeId]
+			if typeString == "" {
+				continue
+			}
+			player, _ := db.QueryESPNPlayer(strconv.Itoa(targetId))
+			if typeString == "dropped" {
+				drops = append(drops, player)
+			} else {
+				adds = append(adds, player)
+				ttype = typeString
+			}
+		}
+		obj := entities.TransactionResponse {
+			Type: ttype,
+			Week: 1,
+			Adds: adds,
+			Drops: drops,
+			Score: totalScore,
+		}
+		log.Println(obj)
+		response = append(response, obj)
+	}
 	return response
 }
 

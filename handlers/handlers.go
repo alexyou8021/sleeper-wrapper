@@ -14,8 +14,19 @@ func Handler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-func CreatePlayersTable(ctx *gin.Context) {
-	db.RemakePlayersTable()
+func GetESPNTransactions(ctx *gin.Context) {
+	id := ctx.Param("id")
+	result := controllers.GetESPNTransactions(id)
+	ctx.JSON(http.StatusOK, result)
+}
+
+func CreateSleeperPlayersTable(ctx *gin.Context) {
+	db.RemakeSleeperPlayersTable()
+	ctx.JSON(http.StatusOK, "success")
+}
+
+func CreateESPNPlayersTable(ctx *gin.Context) {
+	db.RemakeESPNPlayersTable()
 	ctx.JSON(http.StatusOK, "success")
 }
 

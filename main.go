@@ -25,14 +25,20 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "success")
 	})
-	router.GET("/refreshPlayersTable", func(ctx *gin.Context) {
-		handlers.CreatePlayersTable(ctx)
+	router.GET("/refreshSleeperPlayersTable", func(ctx *gin.Context) {
+		handlers.CreateSleeperPlayersTable(ctx)
+	})
+	router.GET("/refreshESPNPlayersTable", func(ctx *gin.Context) {
+		handlers.CreateESPNPlayersTable(ctx)
 	})
 	router.GET("/refreshStatsTable", func(ctx *gin.Context) {
 		handlers.CreateStatsTable(ctx)
 	})
-	router.GET("/user/:name", func(ctx *gin.Context) {
+	router.GET("/user/sleeper/:name", func(ctx *gin.Context) {
 		handlers.Handler(ctx)
+	})
+	router.GET("/user/espn/:id", func(ctx *gin.Context) {
+		handlers.GetESPNTransactions(ctx)
 	})
 
 	router.Run(":" + port)

@@ -10,6 +10,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/alexyou8021/sleeper-wrapper.git/entities"
+	"github.com/alexyou8021/sleeper-wrapper.git/clients/espn"
 	"github.com/alexyou8021/sleeper-wrapper.git/clients/sleeper"
 	"github.com/alexyou8021/sleeper-wrapper.git/clients/datapros"
 )
@@ -18,9 +19,14 @@ var (
 	db  *sql.DB
 )
 
-func RemakePlayersTable() {
-	CreatePlayersTable()
-	StorePlayers()
+func RemakeSleeperPlayersTable() {
+	CreateSleeperPlayersTable()
+	StoreSleeperPlayers()
+}
+
+func RemakeESPNPlayersTable() {
+	CreateESPNPlayersTable()
+	StoreESPNPlayers()
 }
 
 func RemakeStatsTable() {
@@ -28,13 +34,24 @@ func RemakeStatsTable() {
 	StoreStats()
 }
 
-func CreatePlayersTable() {
+func CreateSleeperPlayersTable() {
 	if db == nil {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
-	result, err := db.Exec("DROP TABLE players;")
-	result, err = db.Exec("CREATE TABLE players (id varchar(255), name varchar(255), position varchar(255));")
+	result, err := db.Exec("DROP TABLE sleeper;")
+	result, err = db.Exec("CREATE TABLE sleeper (id varchar(255), name varchar(255), position varchar(255));")
+	log.Println(result)
+	log.Println(err)
+}
+
+func CreateESPNPlayersTable() {
+	if db == nil {
+		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	}
+
+	result, err := db.Exec("DROP TABLE espn;")
+	result, err = db.Exec("CREATE TABLE espn (id varchar(255), name varchar(255), position varchar(255));")
 	log.Println(result)
 	log.Println(err)
 }
@@ -50,7 +67,7 @@ func CreateStatsTable() {
 	log.Println(err)
 }
 
-func StorePlayers() {
+func StoreSleeperPlayers() {
 	if db == nil {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
@@ -64,7 +81,7 @@ func StorePlayers() {
 			name = value["first_name"].(string) + " " + value["last_name"].(string)
 		}
 		position, _ := value["position"].(string)
-		execCmd := "INSERT INTO players VALUES ('" + id + "', '" + name + "', '" + position + "');"
+		execCmd := "INSERT INTO sleeper VALUES ('" + id + "', '" + name + "', '" + position + "');"
 		log.Println(execCmd)
 		_, err := db.Exec(execCmd)
 		if err != nil {
@@ -72,6 +89,32 @@ func StorePlayers() {
 			break
 		}
 	}
+	log.Println(len(players))
+}
+
+func StoreESPNPlayers() {
+	if db == nil {
+		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	}
+	players := espn.GetPlayers()
+
+	for _, value := range players {
+		id := strconv.Itoa(value.Id)
+		name := value.FullName
+		name = strings.Replace(name, "'", "''", 1)
+		if name == "" {
+			name = value.FirstName + " " + value.LastName
+		}
+		position := entities.PositionMap[value.PositionId]
+		execCmd := "INSERT INTO espn VALUES ('" + id + "', '" + name + "', '" + position + "');"
+		log.Println(execCmd)
+		_, err := db.Exec(execCmd)
+		if err != nil {
+			log.Fatal(err)
+			break
+		}
+	}
+	log.Println(len(players))
 }
 
 func StoreStats() {
@@ -106,14 +149,14 @@ func StoreStats() {
 }
 
 func QueryPlayer(id string) (entities.Player, error) {
-	log.Println("QueryPlayer: " + id)
+	log.Println("QuerySleeperPlayer: " + id)
 	var player entities.Player
 
 	if db == nil {
 		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	}
 
-	result, err := db.Query("SELECT * FROM players WHERE id='" + id+ "';")
+	result, err := db.Query("SELECT * FROM sleeper WHERE id='" + id+ "';")
 	if err != nil {
 		log.Fatal(err)
 		return player, err
@@ -141,6 +184,50 @@ func QueryPlayer(id string) (entities.Player, error) {
 		lastName := splitName[1]
 		formattedName := strings.Replace(firstName + "-" + lastName, "--", "-", 1)
 		player.ImageURL = "https://sleepercdn.com/content/nfl/players/" + player.Id + ".jpg";
+		player.Hyperlink = "https://www.nfl.com/players/" + formattedName + "/stats/logs"
+	}
+
+	return player, nil
+}
+
+
+func QueryESPNPlayer(id string) (entities.Player, error) {
+	log.Println("QueryESPNPlayer: " + id)
+	var player entities.Player
+
+	if db == nil {
+		db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	}
+
+	result, err := db.Query("SELECT * FROM espn WHERE id='" + id+ "';")
+	if err != nil {
+		log.Fatal(err)
+		return player, err
+	}
+
+	for result.Next() {
+		err = result.Scan(&player.Id, &player.Name, &player.Position)
+		if err != nil {
+			log.Fatal(err)
+			return player, err
+		}
+	}
+	if player.Position == "D/ST" {
+		dstId := entities.DstMap[player.Id]
+		//formattedName := strings.ReplaceAll(player.Name, " ", "-")
+		player.ImageURL = "https://a.espncdn.com/i/teamlogos/nfl/500/" + dstId + ".png"
+		//player.Hyperlink = "https://www.nfl.com/teams/" + formattedName + "/stats"
+	} else {
+		replacedName := strings.ReplaceAll(player.Name, ".", "-")
+		replacedName = strings.ReplaceAll(replacedName, "'", "-")
+		splitName := strings.Split(replacedName, " ")
+		firstName := splitName[0]
+		if len(firstName) == 2 && firstName != "Bo" && firstName != "Ty" {
+			firstName = firstName[:1] + "-" + firstName[1:]
+		}
+		lastName := splitName[1]
+		formattedName := strings.Replace(firstName + "-" + lastName, "--", "-", 1)
+		player.ImageURL = "https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/" + player.Id + ".png";
 		player.Hyperlink = "https://www.nfl.com/players/" + formattedName + "/stats/logs"
 	}
 
