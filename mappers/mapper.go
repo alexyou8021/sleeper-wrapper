@@ -8,8 +8,8 @@ import (
 	"github.com/alexyou8021/sleeper-wrapper.git/clients/db"
 )
 
-func ToTransactionResponse(transactions []entities.Transaction) []entities.TransactionResponse {
-	response := []entities.TransactionResponse{}
+func ToTransactionResponse(transactions []entities.Transaction, league entities.League, rosters []entities.Roster) entities.TransactionResponse {
+	details := []entities.TransactionDetails{}
 	for _, transaction := range transactions {
 		score := 0.0
 		adds := []entities.Player{}
@@ -54,13 +54,19 @@ func ToTransactionResponse(transactions []entities.Transaction) []entities.Trans
 			playerScore, _ := db.QueryStats(player.Name, strconv.Itoa(transaction.Week), player.Position)
 			score = score - playerScore.HalfPPR
 		}
-		response = append(response, entities.TransactionResponse{
+		details = append(details, entities.TransactionDetails{
 			Type: transaction.Type,
 			Week: transaction.Week,
 			Adds: adds,
 			Drops: drops,
 			Score: math.Round(score*100)/100,
 		})
+	}
+	response := entities.TransactionResponse{
+		Transactions: details,
+		LeagueId: league.LeagueId,
+		LeagueName: league.Name,
+		LeagueMembers: rosters,
 	}
 	return response
 }

@@ -11,17 +11,19 @@ import (
 	"strconv"
 )
 
-func Controller(username string) []entities.TransactionResponse {
+func Controller(username string) entities.TransactionResponse {
 	user := sleeper.GetUserByUsername(username)
 	leagues := sleeper.GetAllLeagues(user)
-	transactions := getTransactionsForUser(user, leagues[0])
-	response := mappers.ToTransactionResponse(transactions)
+	league := leagues[0]
+	rosters := sleeper.GetLeagueRosters(league)
+	transactions := getTransactionsForUser(user, league, rosters)
+	response := mappers.ToTransactionResponse(transactions, league, rosters)
 
 	return response
 }
 
-func GetESPNTransactions(id string) []entities.TransactionResponse {
-	var response []entities.TransactionResponse
+func GetESPNTransactions(id string) entities.TransactionResponse {
+	var details []entities.TransactionDetails
 
 	transactions := espn.GetLeagueTransactions(id)
 	for _, transaction := range transactions {
@@ -54,7 +56,7 @@ func GetESPNTransactions(id string) []entities.TransactionResponse {
 				ttype = typeString
 			}
 		}
-		obj := entities.TransactionResponse {
+		obj := entities.TransactionDetails {
 			Type: ttype,
 			Week: 1,
 			Adds: adds,
@@ -62,21 +64,24 @@ func GetESPNTransactions(id string) []entities.TransactionResponse {
 			Score: totalScore,
 		}
 		log.Println(obj)
-		response = append(response, obj)
+		details = append(details, obj)
+	}
+	response := entities.TransactionResponse{
+		Transactions: details,
+		LeagueId: id,
 	}
 	return response
 }
 
-func getTransactionsForUser(user entities.User, league entities.League) []entities.Transaction {
+func getTransactionsForUser(user entities.User, league entities.League, rosters []entities.Roster) []entities.Transaction {
 	transactions := sleeper.GetAllTransactions(league)
-	rosterId := getRosterIdFromLeagueForUser(user, league)
+	rosterId := getRosterIdForUser(user, rosters)
 	result := getTransactionsFromRosterId(transactions, rosterId)
 
 	return result
 }
 
-func getRosterIdFromLeagueForUser(user entities.User, league entities.League) int {
-	rosters := sleeper.GetLeagueRosters(league)
+func getRosterIdForUser(user entities.User, rosters []entities.Roster) int {
 	for _, roster := range rosters {
 		if roster.OwnerId == user.UserId {
 			return roster.RosterId

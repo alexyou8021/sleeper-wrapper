@@ -29,14 +29,20 @@ type Transaction struct {
 	Score		float64		`json:"score"`
 }
 
-type TransactionResponse struct {
-	Type		string			`json:"type"`
-	Week		int			`json:"week"`
-	Adds		[]Player		`json:"adds"`
-	Drops		[]Player		`json:"drops"`
-	Score		float64			`json:"score"`
+type TransactionDetails struct {
+	Type		string		`json:"type"`
+	Week		int		`json:"week"`
+	Adds		[]Player	`json:"adds"`
+	Drops		[]Player	`json:"drops"`
+	Score		float64		`json:"score"`
 }
 
+type TransactionResponse struct {
+	Transactions	[]TransactionDetails	`json:"transaction_details"`
+	LeagueId	string			`json:"league_id"`
+	LeagueName	string			`json:"league_name"`
+	LeagueMembers	[]Roster		`json:"league_members"`
+}
 type Player struct {
         Id		string `json:"id"`
         Name     	string `json:"name"`
