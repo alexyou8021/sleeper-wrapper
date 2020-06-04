@@ -44,6 +44,18 @@ func GetLeagueRosters(league entities.League) []entities.Roster {
 	return rosters
 }
 
+func GetLeagueUsers(league entities.League) []entities.User {
+	league_id := league.LeagueId
+	url := "https://api.sleeper.app/v1/league/" + league_id + "/users"
+	resp, _ := http.Get(url)
+	defer resp.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	var users []entities.User
+	json.Unmarshal(bodyBytes, &users)
+
+	return users
+}
+
 func GetAllTransactions(league entities.League) []entities.Transaction {
 	league_id := league.LeagueId
 	totalTransactions := []entities.Transaction{}
@@ -71,38 +83,3 @@ func GetPlayers() map[string]map[string]interface{} {
 
 	return players
 }
-/*func GetStats(season string, week string) map[int]map[string]float32 {
-	url := "https://api.sleeper.app/v1/stats/nfl/regular/" + season + "/" + week
-	resp, _ := http.Get(url)
-	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	var stats map[int]map[string]float32
-	json.Unmarshal(bodyBytes, &stats)
-
-	return stats
-}
-
-func GetLeague(groupid string) League {
-	url := "https://api.groupme.com/v3/groups/" + groupid + "?token="
-	url = url + os.Getenv("token")
-	resp, _ := http.Get(url)
-
-	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	var league League
-	json.Unmarshal(bodyBytes, &league)
-
-	return league
-}
-
-func GetRosters(league string) []map[string]interface{} {
-	url := "https://api.sleeper.app/v1/league/" + league + "/rosters"
-	resp, _ := http.Get(url)
-
-	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	var rosters []map[string]interface{}
-	json.Unmarshal(bodyBytes, &rosters)
-
-	return rosters
-}*/

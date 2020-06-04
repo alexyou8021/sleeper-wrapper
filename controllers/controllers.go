@@ -15,7 +15,7 @@ func Controller(username string) entities.TransactionResponse {
 	user := sleeper.GetUserByUsername(username)
 	leagues := sleeper.GetAllLeagues(user)
 	league := leagues[0]
-	rosters := sleeper.GetLeagueRosters(league)
+	rosters := getLeagueRosters(league)
 	transactions := getTransactionsForUser(user, league, rosters)
 	response := mappers.ToTransactionResponse(transactions, league, rosters)
 
@@ -71,6 +71,18 @@ func GetESPNTransactions(id string) entities.TransactionResponse {
 		LeagueId: id,
 	}
 	return response
+}
+
+func getLeagueRosters(league entities.League) []entities.Roster {
+	rosters := sleeper.GetLeagueRosters(league)
+	users := sleeper.GetLeagueUsers(league)
+
+	for i, _ := range rosters {
+		rosters[i].TeamName = users[i].Metadata.TeamName
+		rosters[i].OwnerUsername = users[i].DisplayName
+	}
+
+	return rosters
 }
 
 func getTransactionsForUser(user entities.User, league entities.League, rosters []entities.Roster) []entities.Transaction {

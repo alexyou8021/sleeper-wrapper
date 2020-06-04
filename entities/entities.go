@@ -1,9 +1,14 @@
 package entities
 
 type User struct {
-	Username    string `json:"username"`
-	UserId      string `json:"user_id"`
-	DisplayName string `json:"display_name"`
+	Username	string 		`json:"username"`
+	UserId		string 		`json:"user_id"`
+	DisplayName	string 		`json:"display_name"`
+	Metadata	TeamData	`json:"metadata"`
+}
+
+type TeamData struct {
+	TeamName	string	`json:"team_name"`
 }
 
 type League struct {
@@ -17,6 +22,8 @@ type Roster struct {
 	LeagueId	string	 `json:"league_id"`
 	OwnerId		string	 `json:"owner_id"`
 	CoOwnersIds     []string `json:"co_owners"`
+	TeamName	string	 `json:"team_name"`
+	OwnerUsername   string   `json:"owner_username"`
 }
 
 type Transaction struct {
